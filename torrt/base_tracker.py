@@ -163,6 +163,8 @@ class BaseTracker(WithSettings):
             'allow_redirects': allow_redirects,
             'headers': headers,
             'timeout': REQUEST_TIMEOUT,
+            'proxies': {'http': 'socks5://192.168.10.1:9100',
+                        'https': 'socks5://192.168.10.1:9100'},
         }
 
         if cookies is not None:

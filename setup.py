@@ -40,7 +40,7 @@ setup(
     zip_safe=False,
 
     install_requires=[
-        'requests',
+        'requests[socks]',
         'beautifulsoup4',
         'torrentool',
         'lxml',

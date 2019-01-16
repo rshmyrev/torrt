@@ -12,6 +12,11 @@ class TelegramNotifier(BaseNotifier):
     alias = 'telegram'
     url = 'https://api.telegram.org/bot'
 
+    r_kwargs = {
+        'proxies': {'http': 'socks5://192.168.10.1:9100',
+                    'https': 'socks5://192.168.10.1:9100'},
+    }
+
     def __init__(self, token, chat_id):
         """
         :param token: str - Telegram's bot token
@@ -27,12 +32,12 @@ class TelegramNotifier(BaseNotifier):
 
     def test_configuration(self):
         url = '%s%s/getMe' % (self.url, self.token)
-        r = requests.get(url)
+        r = requests.get(url, **self.r_kwargs)
         return r.json().get('ok', False)
 
     def send_message(self, msg):
         url = '%s%s/sendMessage' % (self.url, self.token)
-        r = requests.post(url, data={'chat_id': self.chat_id, 'text': msg})
+        r = requests.post(url, data={'chat_id': self.chat_id, 'text': msg}, **self.r_kwargs)
         if r.json()['ok']:
             LOGGER.info('Telegram message was sent to user %s' % self.chat_id)
         else:
