@@ -31,8 +31,9 @@ class BaseTracker(WithSettings):
     encoding = None
     """Tracker html page encoding (cp1251 or other)."""
 
-    def __init__(self):
+    def __init__(self, tor_address=None):
         self.mirror_picked = None
+        self.tor_address = tor_address
 
     def encode_value(self, value):
         """Encodes a value.
@@ -163,9 +164,10 @@ class BaseTracker(WithSettings):
             'allow_redirects': allow_redirects,
             'headers': headers,
             'timeout': REQUEST_TIMEOUT,
-            'proxies': {'http': 'socks5://192.168.10.1:9100',
-                        'https': 'socks5://192.168.10.1:9100'},
         }
+        if self.tor_address:
+            r_kwargs.update({'proxies': {'http': 'socks5://{}'.format(self.tor_address),
+                                         'https': 'socks5://{}'.format(self.tor_address)}})
 
         if cookies is not None:
             r_kwargs['cookies'] = cookies
@@ -357,8 +359,8 @@ class GenericPrivateTracker(GenericPublicTracker):
     # HTTP GET (query string) parameter name to verify that a log in was successful. Probably session ID.
     auth_qs_param_name = None
 
-    def __init__(self, username=None, password=None, cookies=None, query_string=None):
-        super(GenericPrivateTracker, self).__init__()
+    def __init__(self, username=None, password=None, cookies=None, query_string=None, tor_address=None):
+        super(GenericPrivateTracker, self).__init__(tor_address=tor_address)
 
         self.logged_in = False
         # Stores a number of login attempts to prevent recursion.

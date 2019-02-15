@@ -3,7 +3,6 @@ import logging
 from torrt.base_tracker import GenericPrivateTracker
 from torrt.utils import TrackerClassesRegistry
 
-
 LOGGER = logging.getLogger(__name__)
 
 
@@ -14,10 +13,10 @@ class AniDUBTracker(GenericPrivateTracker):
     login_url = 'http://%(domain)s/'
     auth_cookie_name = 'dle_user_id'
 
-    def __init__(self, username=None, password=None, cookies=None, query_string=None, quality_prefs=None):
-        super(AniDUBTracker, self).__init__(
-            username=username, password=password, cookies=cookies, query_string=query_string
-        )
+    def __init__(self, username=None, password=None, cookies=None, query_string=None, quality_prefs=None,
+                 tor_address=None):
+        super(AniDUBTracker, self).__init__(username=username, password=password, cookies=cookies,
+                                            query_string=query_string, tor_address=tor_address)
         if quality_prefs is None:
             quality_prefs = ['bd720', 'tv720', 'dvd480', 'hwp', 'psp']
         self.quality_prefs = quality_prefs
@@ -34,7 +33,7 @@ class AniDUBTracker(GenericPrivateTracker):
 
         if page_soup.select('form input[name="login"]'):
             LOGGER.debug('Login is required to download torrent file.')
-            domain =  self.extract_domain(url)
+            domain = self.extract_domain(url)
             if self.login(domain):
                 download_link = self.get_download_link(url)
         else:

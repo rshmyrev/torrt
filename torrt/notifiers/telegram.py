@@ -12,19 +12,23 @@ class TelegramNotifier(BaseNotifier):
     alias = 'telegram'
     url = 'https://api.telegram.org/bot'
 
-    r_kwargs = {
-        'proxies': {'http': 'socks5://192.168.10.1:9100',
-                    'https': 'socks5://192.168.10.1:9100'},
-    }
-
-    def __init__(self, token, chat_id):
+    def __init__(self, token, chat_id, proxies=None, tor_address=None):
         """
+        :param tor_address:
+        :param proxies:
         :param token: str - Telegram's bot token
         :param chat_id: str - Telegram's chat ID
         """
 
         self.token = token
         self.chat_id = chat_id
+        if tor_address:
+            self.proxies = {'http': 'socks5://{}'.format(tor_address),
+                            'https': 'socks5://{}'.format(tor_address)}
+        else:
+            self.proxies = proxies
+
+        self.r_kwargs = {'proxies': self.proxies}
 
     def make_message(self, torrent_data):
         return '''The following torrents were updated:\n%s''' \
@@ -41,7 +45,7 @@ class TelegramNotifier(BaseNotifier):
         if r.json()['ok']:
             LOGGER.info('Telegram message was sent to user %s' % self.chat_id)
         else:
-            LOGGER.error('Telegram notification not send: %s' % r['description'])
+            LOGGER.error('Telegram notification not send: %s' % r.json()['description'])
 
 
 NotifierClassesRegistry.add(TelegramNotifier)
